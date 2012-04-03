@@ -2,13 +2,15 @@ griffon.project.dependency.resolution = {
     inherits "global"
     log "warn"
     repositories {
-        griffonPlugins()
         griffonHome()
-        griffonCentral()
         mavenCentral()
     }
     dependencies {
-        compile 'net.sf.jalarms:jalarms-core:1.5.2'
+        String jalarmsVersion = '1.6.1'
+        compile("net.sf.jalarms:jalarms-core:$jalarmsVersion",
+                "net.sf.jalarms:jalarms-channels:$jalarmsVersion") {
+            excludes 'spring-context-support', 'memcached', 'org.apache.servicemix.bundles.jsendnsca-core', 'jml'        
+        }
     }
 }
 
@@ -20,4 +22,3 @@ griffon {
     }
 }
 
-griffon.jars.destDir='target/addon'

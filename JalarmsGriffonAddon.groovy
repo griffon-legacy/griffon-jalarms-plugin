@@ -14,28 +14,31 @@
  * Lesser General Public License for more details.
  */
 
-import com.solab.alarms.AlarmChannel
+import griffon.core.GriffonClass
+import griffon.core.GriffonApplication
 import com.solab.alarms.AlarmSender
+import com.solab.alarms.AlarmChannel
+import griffon.plugins.jalarms.JAlarmsEnhancer
 
 /**
  * @author Andres Almiray
  */
 class JalarmsGriffonAddon {
-    def events = [
-        NewInstance: {klass, type, instance ->
-            def types = app.config.griffon?.jalarms?.injectInto ?: ['controller', 'service']
-            if(!types.contains(type)) return
-            def mc = app.artifactManager.findGriffonClass(klass).metaClass
-            mc.sendAlarm = sendAlarm
+    void addonPostInit(GriffonApplication app) {
+        def types = app.config.griffon?.jalarms?.injectInto ?: ['controller']
+        for(String type : types) {
+            for(GriffonClass gc : app.artifactManager.getClassesOfType(type)) {
+                JAlarmsEnhancer.enhance(gc.metaClass)
+            }
         }
-    ]
+    }
 
     private sendAlarm = {String... args ->
         app.applicationContext.alarmer.sendAlarm(*args)
     }
 
     def doWithSpring = {
-        alarmer(com.solab.alarms.AlarmSender) { bean ->
+        alarmer(com.solab.alarms.AlarmSenderImpl) { bean ->
             bean.scope = 'singleton'
             bean.autowire = 'byName'
         }

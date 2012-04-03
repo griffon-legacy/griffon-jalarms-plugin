@@ -14,19 +14,25 @@
  * Lesser General Public License for more details.
  */
 
+package griffon.plugins.jalarms
+
+import com.solab.alarms.AlarmSender
+import griffon.spring.ApplicationContextHolder
+
 /**
  * @author Andres Almiray
  */
-
-// check to see if we already have a JalarmsGriffonAddon
-boolean addonIsSet1
-builderConfig.each() { prefix, v ->
-    v.each { builder, views ->
-        addonIsSet1 = addonIsSet1 || 'JalarmsGriffonAddon' == builder
+@Singleton
+class JAlarmsConnector implements JAlarmsProvider { 
+    void sendAlarm(String message, boolean force = false) {
+        force? alarmSender().sendAlarmAlways(message) : alarmSender().sendAlarm(message)
     }
-}
 
-if (addonIsSet1) {
-    println 'Removing JalarmsGriffonAddon from Builder.groovy'
-    builderConfigFile.text = builderConfigFile.text - "root.'JalarmsGriffonAddon'.addon=true\n"
+    void sendAlarm(String message, String source, boolean force = false) {
+        force? alarmSender().sendAlarmAlways(message, source) : alarmSender().sendAlarm(message, source)
+    }
+
+    private AlarmSender alarmSender() {
+        ApplicationContextHolder.applicationContext.alarmer
+    }
 }

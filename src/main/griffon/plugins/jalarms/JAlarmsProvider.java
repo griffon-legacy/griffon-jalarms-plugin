@@ -14,20 +14,21 @@
  * Lesser General Public License for more details.
  */
 
+package griffon.plugins.jalarms;
+
+import java.util.Map;
+import groovy.lang.Closure;
+import griffon.util.CallableWithArgs;
+
 /**
  * @author Andres Almiray
  */
+public interface JAlarmsProvider {
+    void sendAlarm(String message);
+    
+    void sendAlarm(String message, boolean force);
 
-def eventClosure1 = binding.variables.containsKey('eventSetClasspath') ? eventSetClasspath : {cl->}
-eventSetClasspath = { cl ->
-    eventClosure1(cl)
-    if(compilingPlugin('jalarms')) return
-    griffonSettings.dependencyManager.flatDirResolver name: 'griffon-jalarms-plugin', dirs: "${jalarmsPluginDir}/addon"
-    griffonSettings.dependencyManager.addPluginDependency('jalarms', [
-        conf: 'compile',
-        name: 'griffon-jalarms-addon',
-        group: 'org.codehaus.griffon.plugins',
-        version: jalarmsPluginVersion
-    ])
+    void sendAlarm(String message, String source);
+
+    void sendAlarm(String message, String source, boolean force);
 }
-
